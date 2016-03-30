@@ -30,9 +30,10 @@ class Autoloader
 	
 	/**
 	 * Register the autoloader
+	 * @param	bool $prepend
 	 */
-	public function register(){
-		spl_autoload_register(array($this, 'loadClass'));
+	public function register($prepend = false){
+		spl_autoload_register(array($this, 'loadClass'), true, $prepend);
 	}
 	
 	/**
