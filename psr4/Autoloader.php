@@ -1,6 +1,9 @@
 <?php
 /**
- * PSR-4 Autoloader for namespaced classes -by Sujeet <sujeetkv90@gmail.com>
+ * PSR-4 Autoloader for namespaced classes
+ * Also supports explicit class mapping.
+ *
+ * @author Sujeet <sujeetkv90@gmail.com>
  * https://github.com/sujeet-kumar/psr-autoloader
  */
 
@@ -8,23 +11,25 @@ class Autoloader
 {
 	const DS = DIRECTORY_SEPARATOR;
 	
+	protected $ns_separator = '\\';
+	protected $file_ext = '.php';
+	
 	protected $ns_prefixes = array();
+	protected $class_map = array();
 	
 	protected $loaded_files = array();
 	
-	protected $ns_separator = '\\';
-	protected $file_ext = '.php';
 	protected $strict_mode = true;
 	
 	/**
 	 * Initialize the autoloader
 	 * @param	bool $strict_mode
-	 * @param	string $ns_separator
 	 * @param	string $file_ext
+	 * @param	string $ns_separator
 	 */
-	public function __construct($strict_mode = true, $ns_separator = '', $file_ext = ''){
-		if(!empty($ns_separator)) $this->ns_separator = $ns_separator;
-		if(!empty($file_ext)) $this->file_ext = $file_ext;
+	public function __construct($strict_mode = true, $file_ext = '', $ns_separator = ''){
+		empty($file_ext) or $this->file_ext = $file_ext;
+		empty($ns_separator) or $this->ns_separator = $ns_separator;
 		$this->strict_mode = (bool) $strict_mode;
 	}
 	
@@ -66,33 +71,48 @@ class Autoloader
     }
 	
 	/**
+	 * Add class map
+	 * @param	array $class_map
+	 */
+	public function addClassMap(array $class_map){
+		$this->class_map = empty($this->class_map) ? $class_map : array_merge($this->class_map, $class_map);
+	}
+	
+	/**
 	 * Load required class
 	 * @param	string $class
 	 */
 	public function loadClass($class){
 		$prefix = $class;
-		$load_seccess = false;
+		$load_success = false;
 		
-		while(false !== $pos = strrpos($prefix, $this->ns_separator)){
-			$prefix = substr($class, 0, $pos + 1);
-			
-			$relative_class = substr($class, $pos + 1);
-			
-			$mapped_file = $this->loadMappedFile($prefix, $relative_class);
-			
-			if($mapped_file){
-				$this->loaded_files[] = $mapped_file;
-				$load_seccess = true;
-				break;
+		if(isset($this->class_map[$class])){
+			if($this->requireFile($this->class_map[$class])){
+				$this->loaded_files[] = $this->class_map[$class];
+				$load_success = true;
 			}
-			
-			$prefix = rtrim($prefix, $this->ns_separator);
+		}else{
+			while(false !== $pos = strrpos($prefix, $this->ns_separator)){
+				$prefix = substr($class, 0, $pos + 1);
+				
+				$relative_class = substr($class, $pos + 1);
+				
+				$mapped_file = $this->loadRelativeFile($prefix, $relative_class);
+				
+				if($mapped_file){
+					$this->loaded_files[] = $mapped_file;
+					$load_success = true;
+					break;
+				}
+				
+				$prefix = rtrim($prefix, $this->ns_separator);
+			}
 		}
 		
-		if($load_seccess === false and $this->strict_mode === true){
+		if($load_success === false and $this->strict_mode === true){
 			throw new Autoloader_Exception('Class "'.$class.'" not found.');
 		}
-		return $load_seccess;
+		return $load_success;
 	}
 	
 	/**
@@ -116,7 +136,7 @@ class Autoloader
 		return $this->loaded_files;
 	}
 	
-	protected function loadMappedFile($prefix, $relative_class){
+	protected function loadRelativeFile($prefix, $relative_class){
 		if(isset($this->ns_prefixes[$prefix]) === false){
 			return false;
 		}

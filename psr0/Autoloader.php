@@ -1,6 +1,7 @@
 <?php
 /**
- * PSR-0 Autoloader for classes -by Sujeet <sujeetkv90@gmail.com>
+ * PSR-0 Autoloader for classes
+ * @author Sujeet <sujeetkv90@gmail.com>
  * https://github.com/sujeet-kumar/psr-autoloader
  */
 
@@ -19,13 +20,13 @@ class Autoloader
 	 * Register the autoloader
 	 * @param	string $base_include_path
 	 * @param	bool $strict_mode
-	 * @param	string $ns_separator
 	 * @param	string $file_ext
+	 * @param	string $ns_separator
 	 */
-	public static function register($base_include_path, $strict_mode = true, $ns_separator = '', $file_ext = ''){
+	public static function register($base_include_path, $strict_mode = true, $file_ext = '', $ns_separator = ''){
 		self::$base_include_path = rtrim($base_include_path, self::DS);
-		if(!empty($ns_separator)) self::$ns_separator = $ns_separator;
-		if(!empty($file_ext)) self::$file_ext = $file_ext;
+		empty($file_ext) or self::$file_ext = $file_ext;
+		empty($ns_separator) or self::$ns_separator = $ns_separator;
 		self::$strict_mode = (bool) $strict_mode;
 		
 		spl_autoload_register(array(get_class(), 'loadClass'));
@@ -87,6 +88,7 @@ class Autoloader
 	/* workaround for Autoloader class consistency */
 	protected function __construct(){} /* prevents class instantiation */
 	protected function __clone(){} /* prevents object cloning */
+	protected function __sleep(){} /* prevent object serialization */
 	protected function __wakeup(){} /* prevent object unserialization */
 }
 
