@@ -50,7 +50,7 @@ class Autoloader
      * @param	string $base_dir
      * @param	bool $prepend
      */
-    public function addNamespace($ns_prefix, $base_dir, $prepend = false) {
+    public function addNamespaceMap($ns_prefix, $base_dir, $prepend = false) {
         $ns_prefix = trim($ns_prefix, $this->ns_separator) . $this->ns_separator;
         
         $base_dir = rtrim($base_dir, self::DS) . self::DS;

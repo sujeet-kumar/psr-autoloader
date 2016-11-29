@@ -7,8 +7,8 @@ require_once realpath(BASEPATH . '../Autoloader.php');
 
 $loader = new Autoloader();
 
-$loader->addNamespace('SuperNs\\Base', BASEPATH.'src');
-$loader->addNamespace('SuperNs\\Base', BASEPATH.'src2');
+$loader->addNamespaceMap('SuperNs\\Base', BASEPATH.'src');
+$loader->addNamespaceMap('SuperNs\\Base', BASEPATH.'src2');
 
 $loader->addClassMap(array(
 	'NormalClass' => BASEPATH.'src'.DS.'NormalClass.php'
