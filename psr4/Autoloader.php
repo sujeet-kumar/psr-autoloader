@@ -4,7 +4,7 @@
  * Also supports explicit class mapping.
  *
  * @author Sujeet <sujeetkv90@gmail.com>
- * @link https://github.com/sujeet-kumar/psr-autoloader
+ * @link https://github.com/sujeetkv/psr-autoloader
  */
 class Autoloader
 {
